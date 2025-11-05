@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+import 'package:football_news/screens/menu.dart';
+// TODO: Impor halaman NewsFormPage jika sudah dibuat
+import 'package:football_news/screens/newslist_form.dart';
+
+class LeftDrawer extends StatelessWidget {
+  const LeftDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    'Football News',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Padding(padding: EdgeInsets.all(10)),
+                    Text(
+                      "Seluruh berita sepak bola terkini di sini!",
+                      textAlign: TextAlign.center, //  TODO : center alignment
+                        style: TextStyle(
+                          fontSize: 15, //  ukuran 15
+                            color: Colors.white, //  warna putih
+                              fontWeight: FontWeight.normal, //  weight biasa
+                    ),
+                    ),
+                ],
+              ),
+            ),
+          // TODO: Bagian routing
+          ListTile(
+            leading: const Icon(Icons.home_outlined),
+            title: const Text('Home'),
+            // Bagian redirection ke MyHomePage
+            onTap: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyHomePage(),
+                  ));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.post_add),
+            title: const Text('Add News'),
+            onTap: () {
+              //redirect ke newsformpage
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NewsFormPage(),
+                ),
+              );
+            },
+          ),
+        //ListTile baru untuk melihat daftar berita
+          ListTile(
+            leading: const Icon(Icons.article_outlined),
+            title: const Text('View News'),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NewsListPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
