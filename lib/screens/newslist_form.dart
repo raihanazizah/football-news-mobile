@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 // TODO: Impor drawer yang sudah dibuat sebelumnya
 import 'package:football_news/widgets/left_drawer.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:football_news/screens/menu.dart';
 
 class NewsFormPage extends StatefulWidget {
   const NewsFormPage({super.key});
@@ -28,6 +32,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -127,7 +132,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: TextFormField(
                       decoration: InputDecoration(
-                        hintText: "URL Thumbnail (opsional)",
+                        hintText: "URL Thumbnail (optional)",
                         labelText: "URL Thumbnail",
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(5.0),
@@ -165,43 +170,44 @@ class _NewsFormPageState extends State<NewsFormPage> {
                           backgroundColor:
                             MaterialStateProperty.all(Colors.indigo),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Berita berhasil disimpan!'),
-                                  content: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text('Judul: $_title'),
-                                        Text('Isi: $_content'),
-                                        Text('Kategori: $_category'),
-                                        Text('Thumbnail: $_thumbnail'),
-                                        Text(
-                                            'Unggulan: ${_isFeatured ? "Ya" : "Tidak"}'),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      child: const Text('OK'),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
+                            // TODO: Replace the URL with your app's URL
+                            // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
+                            // If you using chrome,  use URL http://localhost:8000
+
+                            final response = await request.postJson(
+                              "http://localhost:8000/create-flutter/",
+                              jsonEncode({
+                                "title": _title,
+                                "content": _content,
+                                "thumbnail": _thumbnail,
+                                "category": _category,
+                                "is_featured": _isFeatured,
+                              }),
                             );
-                            _formKey.currentState!.reset();
+                            if (context.mounted) {
+                              if (response['status'] == 'success') {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("News successfully saved!"),
+                                ));
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MyHomePage()),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(const SnackBar(
+                                  content: Text("Something went wrong, please try again."),
+                                ));
+                              }
+                            }
                           }
                         },
                         child: const Text(
-                          "Simpan",
+                          "Save",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -210,68 +216,6 @@ class _NewsFormPageState extends State<NewsFormPage> {
                 ],
             )
         ),
-      ),
-    );
-  }
-}
-
-//ini buat view news, baru diisi dummy
-class NewsListPage extends StatelessWidget {
-  const NewsListPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Contoh dummy data
-    final List<Map<String, dynamic>> dummyNews = [
-      {
-        "title": "Real Madrid Juara Lagi!",
-        "category": "update",
-        "isFeatured": true,
-      },
-      {
-        "title": "Bellingham Cetak Gol Kemenangan",
-        "category": "match",
-        "isFeatured": false,
-      },
-      {
-        "title": "Ronaldo Umumkan Klub Baru",
-        "category": "transfer",
-        "isFeatured": false,
-      },
-    ];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Daftar Berita"),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
-      ),
-
-      drawer: const LeftDrawer(), // biar drawer tetap ada di semua halaman
-
-      body: ListView.builder(
-        itemCount: dummyNews.length,
-        itemBuilder: (context, index) {
-          final news = dummyNews[index];
-          return Card(
-            margin: const EdgeInsets.all(8.0),
-            elevation: 3,
-            child: ListTile(
-              leading: Icon(
-                news["isFeatured"] ? Icons.star : Icons.article_outlined,
-                color: news["isFeatured"] ? Colors.amber : Colors.grey,
-              ),
-              title: Text(news["title"]),
-              subtitle: Text("Kategori: ${news["category"]}"),
-              onTap: () {
-                // nanti bisa diarahkan ke halaman detail berita
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Kamu memilih: ${news["title"]}")),
-                );
-              },
-            ),
-          );
-        },
       ),
     );
   }
