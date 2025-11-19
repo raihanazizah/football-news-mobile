@@ -5,7 +5,7 @@ name: Release
 on:
   # Triggers the workflow on push events but only for the main branch
   push:
-    branches: [main] #aku pakai branch main
+    branches: [main] #pakai branch main
 
 # Permissions needed for creating releases
 permissions:
