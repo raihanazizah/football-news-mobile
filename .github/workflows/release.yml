@@ -5,7 +5,7 @@ name: Release
 on:
   # Triggers the workflow on push events but only for the main branch
   push:
-    branches: [main] #pakai branch main buat bitrise
+    branches: [main] #pakai branch main untuk bitrise
 
 # Permissions needed for creating releases
 permissions:
